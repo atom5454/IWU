@@ -282,9 +282,12 @@ public class Move : MonoBehaviour
             .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
         var massPickupBounds = GameObject.FindGameObjectsWithTag("PickSpeed")
             .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
+        var playerBounds = GetComponent<Collider2D>().bounds;
+        playerBounds.Expand(3.0f); // avoid spawning objects right in front of the player
         return blockBounds.Concat(pickupBounds)
             .Concat(massPickupBounds)
             .Concat(speedPickupBounds)
+            .Append(playerBounds)
             .ToArray();
     }
 }
