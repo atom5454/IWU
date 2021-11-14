@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Diagnostics;
 
 public class Move : MonoBehaviour
 {
@@ -119,6 +119,7 @@ public class Move : MonoBehaviour
 
         rd2d.AddForce(movement);
     }
+
     private void ChangeSpeedVar1()
     {
         var x = rd2d.velocity.x;
@@ -155,9 +156,7 @@ public class Move : MonoBehaviour
     {
         if (other.gameObject.CompareTag("PickUps"))
         {
-            Destroy(other.gameObject);
-            score += 1;
-            SetCountText();
+            HandleHumanPickedUp(other.gameObject);
         }
         else if (other.gameObject.CompareTag("PickMass"))
         {
@@ -178,18 +177,6 @@ public class Move : MonoBehaviour
         //{
         //    winText.text = "You win";
         //}
-        human--;
-
-        if (human == 0)
-        {
-            human = Random.Range(3, 5);
-            for (int i = 0; i < human; i++)
-            {
-                int x = Random.Range(-10, 11);
-                int y = Random.Range(-4, 4);
-                Instantiate(prefab, new Vector3(x, y, 0), Quaternion.identity);
-            }
-        }
         if (score >= 8 && humanMass == 0)
         {
             SetMass();
@@ -197,6 +184,33 @@ public class Move : MonoBehaviour
         if (score >= 5 && humanSpeed == 0)
         {
             SetSpeed();
+        }
+    }
+
+    private void HandleHumanPickedUp(GameObject targetHuman)
+    {
+        human--;
+        score += 1;
+        Destroy(targetHuman);
+        SetCountText();
+        if (human == 0)
+        {
+            var boundsToAvoid = GetBoundsToAvoid();
+            human = Random.Range(3, 5);
+            var i = 0;
+            while (i < human)
+            {
+                int x = Random.Range(-10, 11);
+                int y = Random.Range(-4, 4);
+                var newHumanTransform = Instantiate(prefab, new Vector3(x, y, 0), Quaternion.identity);
+                var newHumanCollider = newHumanTransform.GetComponent<Collider2D>();
+                if (boundsToAvoid.Any(newHumanCollider.bounds.Intersects))
+                {
+                    Destroy(newHumanTransform.gameObject);
+                    continue; // skip incrementing the counter and try again
+                }
+                i++;
+            }
         }
     }
 
@@ -208,20 +222,27 @@ public class Move : MonoBehaviour
             rd2d.mass += 0.1f;
         }
 
-        if (score >= 8)
+        if (score >= 8 && humanMass == 0)
         {
-            if (humanMass == 0)
+            var boundsToAvoid = GetBoundsToAvoid();
+            humanMass = Random.Range(1, 1);
+            var i = 0;
+            while (i < humanMass)
             {
-                humanMass = Random.Range(1, 1);
-                for (int i = 0; i < humanMass; i++)
+                int x = Random.Range(-10, 11);
+                int y = Random.Range(-4, 4);
+                var newHumanTransform = Instantiate(prefabMass, new Vector3(x, y, 0), Quaternion.identity);
+                var newHumanBounds = newHumanTransform.GetComponent<Collider2D>().bounds;
+                if (boundsToAvoid.Any(newHumanBounds.Intersects))
                 {
-                    int x = Random.Range(-10, 11);
-                    int y = Random.Range(-4, 4);
-                    Instantiate(prefabMass, new Vector3(x, y, 0), Quaternion.identity);
+                    Destroy(newHumanTransform.gameObject);
+                    continue; // skip incrementing the counter and try one more time
                 }
+                i++;
             }
         }
     }
+
     void SetSpeed()
     {
         if(humanSpeed > 0)
@@ -229,18 +250,44 @@ public class Move : MonoBehaviour
             humanSpeed--;
             speed += 0.1f;
         }
-        if (score >= 5)
+        if (score >= 5 && humanSpeed == 0)
         {
-            if (humanSpeed == 0)
+            humanSpeed = Random.Range(1, 1);
+            var boundsToAvoid = GetBoundsToAvoid();
+            var i = 0;
+            while (i < humanSpeed)
             {
-                humanSpeed = Random.Range(1, 1);
-                for (int i = 0; i < humanSpeed; i++)
+                int x = Random.Range(-10, 11);
+                int y = Random.Range(-4, 4);
+                var newHumanTransform = Instantiate(prefabSpeed, new Vector3(x, y, 0), Quaternion.identity);
+                var newHumanBounds = newHumanTransform.GetComponent<Collider2D>().bounds;
+                if (boundsToAvoid.Any(newHumanBounds.Intersects))
                 {
-                    int x = Random.Range(-10, 11);
-                    int y = Random.Range(-4, 4);
-                    Instantiate(prefabSpeed, new Vector3(x, y, 0), Quaternion.identity);
+                    Destroy(newHumanTransform.gameObject);
+                    continue; // skip incrementing the counter and try one more time
                 }
+                i++;
             }
         }
+    }
+
+    private Bounds[] GetBoundsToAvoid()
+    {
+        var blockContainer = GameObject.Find("Block");
+        var blockBounds = blockContainer.GetComponentsInChildren<Collider2D>()
+            .Select(collider => collider.bounds);
+        var pickupBounds = GameObject.FindGameObjectsWithTag("PickUps")
+            .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
+        var speedPickupBounds = GameObject.FindGameObjectsWithTag("PickSpeed")
+            .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
+        var massPickupBounds = GameObject.FindGameObjectsWithTag("PickSpeed")
+            .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
+        var playerBounds = GetComponent<Collider2D>().bounds;
+        playerBounds.Expand(3.0f); // avoid spawning objects right in front of the player
+        return blockBounds.Concat(pickupBounds)
+            .Concat(massPickupBounds)
+            .Concat(speedPickupBounds)
+            .Append(playerBounds)
+            .ToArray();
     }
 }
