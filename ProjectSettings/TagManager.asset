@@ -8,6 +8,7 @@ TagManager:
   - PickMass
   - PickSpeed
   - Block
+  - Damage
   layers:
   - Default
   - TransparentFX

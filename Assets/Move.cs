@@ -13,29 +13,35 @@ public class Move : MonoBehaviour
     public Transform prefabMass;
     public Transform prefabSpeed;
 
-    private int score;
-    public int human;
-    public int humanMass;
-    public int humanSpeed;
+    private int score = 0;
+    private int human = 5;
+    private int humanMass = 0;
+    private int humanSpeed = 0;
+
+    private bool hasDamage = false;
+    public float delayDamage = 0.0f;
+
+    //after how many seconds the player will receive damage after the last damage
+    public float defaultDelayDamage = 0.5f;
 
     public float speed;
+    private float health = 100;
 
     public Text countText;
     public Text winText;
+    public Text healthText;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         rd2d = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
-
-        score = 0;
-        human = 5;
-        humanMass = 0;
-        humanSpeed = 0;
-
-        SetCountText();
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+        UpdateCountText();
         winText.text = "";
+        healthText.text = "Health: " + health.ToString();
     }
 
     // Update is called once per frame
@@ -44,6 +50,17 @@ public class Move : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             sprite.color = Color.black;
+        }
+
+        if(delayDamage > 0 && hasDamage == false)
+        {
+            delayDamage -= Time.deltaTime;
+            hasDamage = false;
+        }
+        if (hasDamage && delayDamage == defaultDelayDamage)
+        {
+            UpdateHealth();
+            hasDamage = false;
         }
     }
 
@@ -70,12 +87,12 @@ public class Move : MonoBehaviour
             }
             else
             {
-                ChangeSpeedVar2();
+                ChangeSpeed();
             }
         }
     }
 
-    private void ChangeSpeedVar2()
+    private void ChangeSpeed()
     {
         Vector2 movement = new Vector2(0, 0);
         Vector2 objectVelocity = rd2d.velocity;
@@ -120,40 +137,31 @@ public class Move : MonoBehaviour
         rd2d.AddForce(movement);
     }
 
-    private void ChangeSpeedVar1()
+    //method is called if ANY objects touching
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        var x = rd2d.velocity.x;
-        var y = rd2d.velocity.y;
-        if (x != 0)
+        if (delayDamage <= 0 && hasDamage == false)
         {
-            if (x > 0)
+            var objectHasDamage = collision.gameObject.GetComponents(typeof(Component)).Any(x => x.name.Contains("Damage"));
+            if (objectHasDamage)
             {
-                Vector2 movement = new Vector2(-0.2f, 0);
-                rd2d.AddForce(movement);
-            }
-            if (x < 0)
-            {
-                Vector2 movement = new Vector2(0.2f, 0);
-                rd2d.AddForce(movement);
+                health -= collision.gameObject.GetComponent<BlockDamage>().blockDamage;
+                hasDamage = true;
+                delayDamage = defaultDelayDamage;
             }
         }
-        if (y != 0)
+
+        if (health <= 0)
         {
-            if (y > 0)
-            {
-                Vector2 movement = new Vector2(0, -0.2f);
-                rd2d.AddForce(movement);
-            }
-            if (y < 0)
-            {
-                Vector2 movement = new Vector2(0, 0.2f);
-                rd2d.AddForce(movement);
-            }
+            Destroy(gameObject);
+            UpdatePlayerText();
+            UpdateHealth();
         }
     }
 
     public void OnTriggerEnter2D(Collider2D other)
     {
+
         if (other.gameObject.CompareTag("PickUps"))
         {
             HandleHumanPickedUp(other.gameObject);
@@ -161,30 +169,35 @@ public class Move : MonoBehaviour
         else if (other.gameObject.CompareTag("PickMass"))
         {
             Destroy(other.gameObject);
-            SetMass();
+            UpdateMass();
         }
         else if (other.gameObject.CompareTag("PickSpeed"))
         {
             Destroy(other.gameObject);
-            SetSpeed();
+            UpdateSpeed();
         }
     }
 
-    void SetCountText()
+    private void UpdateCountText()
     {
         countText.text = "Score: " + score.ToString();
-        //if(count >= 5)
-        //{
-        //    winText.text = "You win";
-        //}
         if (score >= 8 && humanMass == 0)
         {
-            SetMass();
+            UpdateMass();
         }
         if (score >= 5 && humanSpeed == 0)
         {
-            SetSpeed();
+            UpdateSpeed();
         }
+    }
+    private void UpdatePlayerText()
+    {
+        winText.text = "You lose";
+    }
+
+    private void UpdateHealth()
+    {
+        healthText.text = "Health: " + health.ToString();
     }
 
     private void HandleHumanPickedUp(GameObject targetHuman)
@@ -192,7 +205,7 @@ public class Move : MonoBehaviour
         human--;
         score += 1;
         Destroy(targetHuman);
-        SetCountText();
+        UpdateCountText();
         if (human == 0)
         {
             var boundsToAvoid = GetBoundsToAvoid();
@@ -214,7 +227,7 @@ public class Move : MonoBehaviour
         }
     }
 
-    void SetMass()
+    private void UpdateMass()
     {
         if(humanMass > 0)
         {
@@ -243,7 +256,7 @@ public class Move : MonoBehaviour
         }
     }
 
-    void SetSpeed()
+    private void UpdateSpeed()
     {
         if(humanSpeed > 0)
         {
