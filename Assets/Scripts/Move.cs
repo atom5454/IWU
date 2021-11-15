@@ -18,7 +18,6 @@ public class Move : MonoBehaviour
     private int humanMass = 0;
     private int humanSpeed = 0;
 
-    private bool hasDamage = false;
     public float delayDamage = 0.0f;
 
     //after how many seconds the player will receive damage after the last damage
@@ -52,15 +51,9 @@ public class Move : MonoBehaviour
             sprite.color = Color.black;
         }
 
-        if(delayDamage > 0 && hasDamage == false)
+        if(delayDamage > 0)
         {
             delayDamage -= Time.deltaTime;
-            hasDamage = false;
-        }
-        if (hasDamage && delayDamage == defaultDelayDamage)
-        {
-            UpdateHealth();
-            hasDamage = false;
         }
     }
 
@@ -140,22 +133,21 @@ public class Move : MonoBehaviour
     //method is called if ANY objects touching
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (delayDamage <= 0 && hasDamage == false)
+        if (delayDamage <= 0)
         {
-            var objectHasDamage = collision.gameObject.GetComponents(typeof(Component)).Any(x => x.name.Contains("Damage"));
-            if (objectHasDamage)
+            var damageComponent = collision.gameObject.GetComponent<DamageComponent>();
+            if (damageComponent != null)
             {
-                health -= collision.gameObject.GetComponent<BlockDamage>().blockDamage;
-                hasDamage = true;
+                health -= damageComponent.blockDamage;
                 delayDamage = defaultDelayDamage;
+                UpdateHealth();
             }
         }
 
         if (health <= 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             UpdatePlayerText();
-            UpdateHealth();
         }
     }
 
@@ -293,7 +285,7 @@ public class Move : MonoBehaviour
             .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
         var speedPickupBounds = GameObject.FindGameObjectsWithTag("PickSpeed")
             .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
-        var massPickupBounds = GameObject.FindGameObjectsWithTag("PickSpeed")
+        var massPickupBounds = GameObject.FindGameObjectsWithTag("PickMass")
             .Select(pickup => pickup.GetComponent<Collider2D>().bounds);
         var playerBounds = GetComponent<Collider2D>().bounds;
         playerBounds.Expand(3.0f); // avoid spawning objects right in front of the player
