@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public Joystick joystick;
     public float speed = 5f;
+    public float braking = 0.4f;
 
     // Start is called before the first frame update
     void Start()
@@ -54,11 +55,11 @@ public class PlayerMovement : MonoBehaviour
             //}
             if (velocityX > 0)
             {
-                movement.x = -0.4f;
+                movement.x = braking * -1;
             }
             if (velocityX < 0)
             {
-                movement.x = 0.4f;
+                movement.x = braking;
             }
         }
         if (velocityY != 0)
@@ -70,11 +71,11 @@ public class PlayerMovement : MonoBehaviour
             //}
             if (velocityY > 0)
             {
-                movement.y = -0.4f;
+                movement.y = braking * -1;
             }
             if (velocityY < 0)
             {
-                movement.y = 0.4f;
+                movement.y = braking;
             }
         }
 

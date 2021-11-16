@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Move : MonoBehaviour
+public class Player : MonoBehaviour
 {
-    private Rigidbody2D rd2d;
+    public Rigidbody2D rd2d;
     private SpriteRenderer sprite;
     private SpawnPickups spawnPickups;
-    private PlayerMovement playerMovement;
+    public PlayerMovement playerMovement;
 
-    private int score = 0;
+    public bool hasSecondLife = false;
+
+    public int score = 0;
     public float delayDamage = 0.0f;
 
     //after how many seconds the player will receive damage after the last damage
     public float defaultDelayDamage = 0.5f;
-    private float health = 100;
+    public float health = 100;
 
     public Text countText;
     public Text winText;
@@ -28,6 +30,14 @@ public class Move : MonoBehaviour
         spawnPickups = GetComponent<SpawnPickups>();
         playerMovement = GetComponent<PlayerMovement>();
     }
+
+    //Called if object SetActive(true)
+    private void OnEnable()
+    {
+        UpdateHealth();
+        UpdateCountText();
+        winText.text = "";
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -39,12 +49,12 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.K))
         {
-            sprite.color = Color.black;
+            KillSelf();
         }
 
-        if(delayDamage > 0)
+        if (delayDamage > 0)
         {
             delayDamage -= Time.deltaTime;
         }
@@ -110,7 +120,14 @@ public class Move : MonoBehaviour
     }
     private void UpdatePlayerText()
     {
-        winText.text = "You lose";
+        if (!hasSecondLife)
+        {
+            winText.text = "You die";
+        }
+        else
+        {
+            winText.text = "You die, if you wanna to use second life press R";
+        }
     }
 
     private void UpdateHealth()
@@ -141,5 +158,12 @@ public class Move : MonoBehaviour
         {
             rd2d.mass += 0.1f;
         }
+    }
+
+    private void KillSelf()
+    {
+        health = 0;
+        gameObject.SetActive(false);
+        UpdatePlayerText();
     }
 }
