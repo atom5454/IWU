@@ -4,18 +4,12 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour
+public class SaveManager
 {
     public SaveManager saveManager;
-    public string path;
+    public static string path = Application.persistentDataPath + "/Saves";
 
-    private void Awake()
-    {
-        //Saves saves in C:\Users\atom5\AppData\LocalLow\MBK\Light\Saves
-        path = Application.persistentDataPath + "/Saves";
-    }
-
-    public bool Save(PlayerData saveData)
+    public static bool Save(PlayerData saveData)
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
 
@@ -31,7 +25,7 @@ public class SaveManager : MonoBehaviour
         return true;
     }
 
-    public PlayerData Load()
+    public static PlayerData Load()
     {
         if (!File.Exists(path + "/Save.dat"))
         {

@@ -7,7 +7,6 @@ public class CheckPoint : MonoBehaviour
 {
     private CircleCollider2D saveCollider;
     private Light2D light2D;
-    private SaveManager saveManager;
 
     private PlayerData playerData;
     private Player currentPlayer;
@@ -22,8 +21,6 @@ public class CheckPoint : MonoBehaviour
         saveCollider = gameObject.GetComponent<CircleCollider2D>();
         light2D = gameObject.GetComponent<Light2D>();
         saveCollider.radius = light2D.pointLightInnerRadius;
-
-        saveManager = gameObject.GetComponent<SaveManager>();
     }
     // Start is called before the first frame update
     void Start()
@@ -51,7 +48,7 @@ public class CheckPoint : MonoBehaviour
             if(currentPlayer.health <= 0 && !currentPlayer.isActiveAndEnabled)
             {
                 //uncomment if you want to use serialization saves
-                //playerData = saveManager.Load();
+                //playerData = SaveManager.Load();
 
                 currentPlayer.delayDamage = playerData.delayDamage;
                 currentPlayer.transform.position = new Vector3(playerData.x, playerData.y, 0);
@@ -60,7 +57,7 @@ public class CheckPoint : MonoBehaviour
                 currentPlayer.defaultDelayDamage = playerData.defaultDelayDamage;
                 currentPlayer.playerMovement.speed = playerData.speed;
                 currentPlayer.rd2d.mass = playerData.mass;
-
+                currentPlayer.hasSecondLife = false;
 
                 currentPlayer.gameObject.SetActive(true);
                 startDelay = true;
@@ -69,7 +66,6 @@ public class CheckPoint : MonoBehaviour
                 SetDefaultLightAndCollider();
                 currentPlayer = null;
                 playerData = null;
-
             }
         }
     }
@@ -88,7 +84,7 @@ public class CheckPoint : MonoBehaviour
                 startDelay = false;
 
                 //uncomment if you want to use serialization saves
-                //saveManager.Save(playerData);
+                //SaveManager.Save(playerData);
             }
         }
     }
@@ -112,6 +108,7 @@ public class CheckPoint : MonoBehaviour
         }
     }
 
+    //called if the player used his second life
     private void SetDefaultLightAndCollider()
     {
         light2D.color = Color.yellow;
