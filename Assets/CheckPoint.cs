@@ -44,7 +44,7 @@ public class CheckPoint : MonoBehaviour
             SetDefaultLightAndCollider();
         }
         if (Input.GetKeyDown(KeyCode.R) && currentPlayer != null && currentPlayer.health <= 0 && !currentPlayer.isActiveAndEnabled)
-            {
+        {
                 //uncomment if you want to use serialization saves
                 //playerData = SaveManager.Load();
 
@@ -64,18 +64,17 @@ public class CheckPoint : MonoBehaviour
                 SetDefaultLightAndCollider();
                 currentPlayer = null;
                 playerData = null;
-            }
         }
     }
-
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (delaySave <= 0 && currentPlayer == null)
         {
             if (collision.gameObject.CompareTag("Player"))
             {
-                playerData = new PlayerData(collision.GetComponent<Player>());
                 currentPlayer = collision.GetComponent<Player>();
+                playerData = new PlayerData(currentPlayer);
+
                 currentPlayer.hasSecondLife = true;
                 UpdateCollliderAndColor();
                 delaySave = defaultDelaySave;
