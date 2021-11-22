@@ -43,9 +43,7 @@ public class CheckPoint : MonoBehaviour
         {
             SetDefaultLightAndCollider();
         }
-        if (Input.GetKeyDown(KeyCode.R) && currentPlayer != null)
-        {
-            if(currentPlayer.health <= 0 && !currentPlayer.isActiveAndEnabled)
+        if (Input.GetKeyDown(KeyCode.R) && currentPlayer != null && currentPlayer.health <= 0 && !currentPlayer.isActiveAndEnabled)
             {
                 //uncomment if you want to use serialization saves
                 //playerData = SaveManager.Load();
