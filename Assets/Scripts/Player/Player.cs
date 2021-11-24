@@ -66,25 +66,16 @@ public class Player : MonoBehaviour
         playerMovement.Move(rd2d);
     }
 
+    //we need this method because if object touch on high speed OnCollisionStay 2D doesn't register the touch
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        TakeDamage(collision);
+    }
+
     //method is called if ANY objects touching
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (delayDamage <= 0)
-        {
-            var damageComponent = collision.gameObject.GetComponent<DamageComponent>();
-            if (damageComponent != null)
-            {
-                health -= damageComponent.blockDamage;
-                delayDamage = defaultDelayDamage;
-                UpdateHealth();
-            }
-        }
-
-        if (health <= 0)
-        {
-            gameObject.SetActive(false);
-            UpdatePlayerText();
-        }
+        TakeDamage(collision);
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -103,6 +94,26 @@ public class Player : MonoBehaviour
         {
             Destroy(other.gameObject);
             UpdateSpeed();
+        }
+    }
+
+    private void TakeDamage(Collision2D otherObjectCollision)
+    {
+        if (delayDamage <= 0)
+        {
+            var damageComponent = otherObjectCollision.gameObject.GetComponent<DamageComponent>();
+            if (damageComponent != null)
+            {
+                health -= damageComponent.blockDamage;
+                delayDamage = defaultDelayDamage;
+                UpdateHealth();
+            }
+        }
+
+        if (health <= 0)
+        {
+            gameObject.SetActive(false);
+            UpdatePlayerText();
         }
     }
 
