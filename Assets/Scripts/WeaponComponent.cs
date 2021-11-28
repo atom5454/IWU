@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageComponent : MonoBehaviour
+public class WeaponComponent : MonoBehaviour
 {
-    public float blockDamage;
+    public float weaponSpeed;
 }

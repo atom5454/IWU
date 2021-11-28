@@ -6,8 +6,7 @@ public class PlayerShoot : MonoBehaviour
 {
     public GameObject gunPoint;
     public GameObject bulletPrefab;
-    public float bulletSpeed = 3f;
-
+    public GameObject flashLight;
     private Player player;
 
     private void Awake()
@@ -20,15 +19,19 @@ public class PlayerShoot : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Shoot();
+            Shoot(bulletPrefab);
+        }
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            Shoot(flashLight);
         }
     }
 
-    private void Shoot()
+    private void Shoot(GameObject gameObject)
     {
-        var bullet = Instantiate(bulletPrefab, gunPoint.transform.position, transform.rotation);
+        var bullet = Instantiate(gameObject, gunPoint.transform.position, transform.rotation);
 
-        Vector2 bulletVelocity = gunPoint.transform.right * bulletSpeed;
+        Vector2 bulletVelocity = gunPoint.transform.right * gameObject.GetComponent<WeaponComponent>().weaponSpeed;
 
         if (bulletVelocity.x > 0 && player.rd2d.velocity.x > 0 || bulletVelocity.x < 0 && player.rd2d.velocity.x < 0)
         {
