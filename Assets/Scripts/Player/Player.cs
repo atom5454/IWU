@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     private SpriteRenderer sprite;
     private SpawnPickups spawnPickups;
     public PlayerMovement playerMovement;
+    public GameObject prefabSubPlayer;
+    private GameObject subPlayer;
 
     public bool hasSecondLife = false;
 
@@ -58,12 +60,20 @@ public class Player : MonoBehaviour
         {
             delayDamage -= Time.deltaTime;
         }
+
+        if (Input.GetKeyDown(KeyCode.Mouse0) && subPlayer == null)
+        {
+            Shoot();
+        }
     }
 
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     private void FixedUpdate()
     {
-        playerMovement.Move(rd2d);
+        if(subPlayer == null)
+        {
+            playerMovement.Move(rd2d);
+        }
     }
 
     //we need this method because if object touch on high speed OnCollisionStay 2D doesn't register the touch
@@ -176,5 +186,19 @@ public class Player : MonoBehaviour
         health = 0;
         gameObject.SetActive(false);
         UpdatePlayerText();
+    }
+
+    private void Shoot()
+    {
+        subPlayer = Instantiate(prefabSubPlayer, transform.position, Quaternion.identity);
+    }
+
+    public GameObject isSubPlayerAlive()
+    {
+        if(subPlayer == null)
+        {
+            return null;
+        }
+        return subPlayer;
     }
 }

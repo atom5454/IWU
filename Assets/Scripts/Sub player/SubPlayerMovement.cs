@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class SubPlayerMovement : MonoBehaviour
 {
-    public Joystick joystick;
+    //public Joystick joystick;
     public float speed = 5f;
     public float braking = 0.4f;
 
     public void Move(Rigidbody2D rd2d)
     {
-        float moveHorizontal = Input.GetAxis("Horizontal") + joystick.Horizontal;
-        float moveVertical = Input.GetAxis("Vertical") + joystick.Vertical;
+        float moveHorizontal = Input.GetAxis("Horizontal"); // + joystick.Horizontal;
+        float moveVertical = Input.GetAxis("Vertical"); // + joystick.Vertical;
 
         if (moveHorizontal != 0 || moveVertical != 0)
         {
@@ -36,11 +36,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (velocityX != 0)
         {
-            //UnPerfomance
-            //if(velocityX > -0.02f && velocityX < 0.02f)
-            //{
-            //    rd2d.velocity = new Vector2(0, velocityY);
-            //}
             if (velocityX > 0)
             {
                 movement.x = braking * -1;
@@ -52,11 +47,6 @@ public class PlayerMovement : MonoBehaviour
         }
         if (velocityY != 0)
         {
-            //UnPerfomance
-            //if (velocityY > -0.02f && velocityY < 0.02f)
-            //{
-            //    rd2d.velocity = new Vector2(0, velocityX);
-            //}
             if (velocityY > 0)
             {
                 movement.y = braking * -1;
