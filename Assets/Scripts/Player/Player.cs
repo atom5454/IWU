@@ -11,9 +11,11 @@ public class Player : MonoBehaviour
     public PlayerMovement playerMovement;
     public GameObject prefabSubPlayer;
     private GameObject subPlayer;
+    public Camera camera;
+
+    private Vector2 mousePosition;
 
     public bool hasSecondLife = false;
-
     public int score = 0;
     public float delayDamage = 0.0f;
 
@@ -51,6 +53,8 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateMousePositiob();
+
         if (Input.GetKeyDown(KeyCode.K))
         {
             KillSelf();
@@ -61,7 +65,7 @@ public class Player : MonoBehaviour
             delayDamage -= Time.deltaTime;
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && subPlayer == null)
+        if (Input.GetKeyDown(KeyCode.C) && subPlayer == null)
         {
             CreateScout();
         }
@@ -205,5 +209,12 @@ public class Player : MonoBehaviour
             return null;
         }
         return subPlayer;
+    }
+
+    private void UpdateMousePositiob()
+    {
+        mousePosition = camera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 lookDirectory = mousePosition - rd2d.position;
+        rd2d.rotation = (Mathf.Atan2(lookDirectory.x, lookDirectory.y) * Mathf.Rad2Deg - 90f) * -1;
     }
 }

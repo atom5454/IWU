@@ -9,6 +9,7 @@ TagManager:
   - PickSpeed
   - Block
   - Damage
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Player
   - 
   - 
   - 
