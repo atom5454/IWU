@@ -9,14 +9,18 @@ public class SubPlayer : MonoBehaviour
     private Rigidbody2D rd2d;
     private SubPlayerMovement subPlayerMovement;
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         rd2d = GetComponent<Rigidbody2D>();
         subPlayerMovement = GetComponent<SubPlayerMovement>();
 
         timeLife = Random.Range(5, 10);
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+
     }
 
     // Update is called once per frame

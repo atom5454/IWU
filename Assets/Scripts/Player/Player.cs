@@ -191,6 +191,11 @@ public class Player : MonoBehaviour
     private void Shoot()
     {
         subPlayer = Instantiate(prefabSubPlayer, transform.position, Quaternion.identity);
+
+        int x = Random.Range(-2, 2);
+        int y = Random.Range(-2, 2);
+
+        subPlayer.transform.position += new Vector3(x, y, subPlayer.transform.position.z);
     }
 
     public GameObject isSubPlayerAlive()
