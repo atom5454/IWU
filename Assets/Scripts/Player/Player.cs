@@ -63,7 +63,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Mouse0) && subPlayer == null)
         {
-            Shoot();
+            CreateScout();
         }
     }
 
@@ -188,7 +188,7 @@ public class Player : MonoBehaviour
         UpdatePlayerText();
     }
 
-    private void Shoot()
+    private void CreateScout()
     {
         subPlayer = Instantiate(prefabSubPlayer, transform.position, Quaternion.identity);
 
